@@ -101,6 +101,12 @@ docker compose watch
 
 ## The `.env` File
 
+For a fresh checkout, create it from the template:
+
+```bash
+cp .env.example .env
+```
+
 The `.env` file contains local development defaults, passwords, and other configuration. Its hostnames use `localhost` for processes running on your machine. Docker Compose overrides hostnames such as the database and SMTP server with their Compose service names.
 
 Do not store deployment secrets in `.env`. Configure them as described in the [Docker Compose deployment guide](./deployment-docker-compose.md).
