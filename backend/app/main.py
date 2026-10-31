@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
@@ -17,10 +17,10 @@ def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"
 
 
-if settings.SENTRY_DSN and settings.FASTAPI_ENV != "development":
-    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
-
 is_development = settings.FASTAPI_ENV == "development"
+
+if settings.SENTRY_DSN and not is_development:
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -41,4 +41,13 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+if not is_development:
+
+    @app.get("/docs", include_in_schema=False, tags=["docs"])
+    @app.get("/redoc", include_in_schema=False, tags=["docs"])
+    def docs_not_found() -> None:
+        raise HTTPException(status_code=404, detail="页面不存在")
+
+
 app.frontend("/", directory=FRONTEND_DIR)

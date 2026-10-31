@@ -5,21 +5,33 @@ from sqlmodel import Session
 
 from app.core.config import settings
 from tests.utils.item import create_random_item
+from tests.utils.user import user_authentication_headers
+from tests.utils.utils import random_email, random_lower_string
 
 
-def test_create_item(
-    client: TestClient, superuser_token_headers: dict[str, str]
-) -> None:
+def test_create_item(client: TestClient) -> None:
+    email = random_email()
+    password = random_lower_string()
+    user_response = client.post(
+        f"{settings.API_V1_STR}/users/signup",
+        json={"email": email, "password": password},
+    )
+    assert user_response.status_code == 200
+    created_user = user_response.json()
+    assert uuid.UUID(created_user["id"]).version == 7
+
+    headers = user_authentication_headers(client=client, email=email, password=password)
     data = {"title": "Foo", "description": "Fighters"}
     response = client.post(
         f"{settings.API_V1_STR}/items/",
-        headers=superuser_token_headers,
+        headers=headers,
         json=data,
     )
     assert response.status_code == 200
     content = response.json()
     assert content["title"] == data["title"]
     assert content["description"] == data["description"]
+    assert content["owner_id"] == created_user["id"]
     assert uuid.UUID(content["id"]).version == 7
     assert uuid.UUID(content["owner_id"]).version == 7
 
