@@ -99,6 +99,7 @@ test("Log in with valid email and password ", async ({ page }) => {
 
   await page.waitForURL("/")
 
+  await expect(page).toHaveTitle("仪表盘 - AnySys")
   await expect(page.getByText("欢迎回来，很高兴再次见到你。")).toBeVisible()
 })
 

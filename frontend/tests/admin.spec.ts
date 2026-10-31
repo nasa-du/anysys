@@ -7,6 +7,7 @@ import { logInUser } from "./utils/user"
 
 test("Admin page is accessible and shows correct title", async ({ page }) => {
   await page.goto("/admin")
+  await expect(page).toHaveTitle("管理后台 - AnySys")
   await expect(page.getByRole("heading", { name: "用户管理" })).toBeVisible()
   await expect(page.getByText("管理用户账号与权限")).toBeVisible()
 })

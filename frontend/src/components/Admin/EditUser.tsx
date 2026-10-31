@@ -29,18 +29,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import useCustomToast from "@/hooks/useCustomToast"
-import { emailSchema } from "@/lib/validation"
+import { emailSchema, passwordSchema } from "@/lib/validation"
 import { handleError } from "@/utils"
 
 const formSchema = z
   .object({
     email: emailSchema,
     full_name: z.string().optional(),
-    password: z
-      .string()
-      .min(8, { message: "密码至少需要 8 个字符" })
-      .optional()
-      .or(z.literal("")),
+    password: passwordSchema.optional().or(z.literal("")),
     confirm_password: z.string().optional(),
     is_superuser: z.boolean().optional(),
     is_active: z.boolean().optional(),
