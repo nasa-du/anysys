@@ -59,17 +59,17 @@ test("Serves the AnySys favicon suite", async ({ page, request }) => {
     .locator('link[rel="icon"]')
     .evaluateAll((links) => links.map((link) => link.getAttribute("href")))
   expect(iconHrefs).toEqual([
-    "/favicon.ico",
-    "/favicon-32x32.png",
-    "/icon-192.png",
-    "/icon-512.png",
+    "/favicon-light.ico",
+    "/favicon-light-32x32.png",
+    "/icon-light-192.png",
+    "/icon-light-512.png",
   ])
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
     "href",
-    "/apple-touch-icon.png",
+    "/apple-touch-icon-light.png",
   )
 
-  for (const href of [...iconHrefs, "/apple-touch-icon.png"]) {
+  for (const href of [...iconHrefs, "/apple-touch-icon-light.png"]) {
     const response = await request.get(href as string)
     expect(response.ok(), `${href} should be served`).toBe(true)
 
