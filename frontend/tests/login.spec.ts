@@ -82,10 +82,13 @@ test("Serves the AnySys favicon suite", async ({ page, request }) => {
   }
 })
 
-test("Unknown route uses a localized page title", async ({ page }) => {
+test("Unknown route uses a localized page", async ({ page }) => {
   await page.goto("/this-route-does-not-exist")
 
   await expect(page).toHaveTitle("页面不存在 - AnySys")
+  await expect(page.getByTestId("not-found")).toContainText("404")
+  await expect(page.getByText("你访问的页面不存在。")).toBeVisible()
+  await expect(page.getByRole("button", { name: "返回首页" })).toBeVisible()
 })
 
 test("Log in with valid email and password ", async ({ page }) => {
@@ -96,9 +99,27 @@ test("Log in with valid email and password ", async ({ page }) => {
 
   await page.waitForURL("/")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("欢迎回来，很高兴再次见到你。")).toBeVisible()
+})
+
+test("App shell is localized", async ({ page }) => {
+  await page.goto("/login")
+
+  await fillForm(page, firstSuperuser, firstSuperuserPassword)
+  await page.getByRole("button", { name: "登录" }).click()
+  await page.waitForURL("/")
+
+  await expect(page.getByText("你好，")).toBeVisible()
+  await expect(page.getByRole("link", { name: "仪表盘" })).toBeVisible()
+  await expect(page.getByRole("link", { name: "条目" })).toBeVisible()
+  await expect(page.getByRole("link", { name: "管理后台" })).toBeVisible()
+
+  await page.getByTestId("user-menu").click()
+  await expect(page.getByRole("menuitem", { name: "设置" })).toBeVisible()
+  await expect(page.getByRole("menuitem", { name: "退出登录" })).toBeVisible()
+
+  await expect(page.locator("body")).not.toContainText("FastAPI")
+  await expect(page.locator('a[href*="fastapi"]')).toHaveCount(0)
 })
 
 test("Log in with invalid email", async ({ page }) => {
@@ -130,12 +151,10 @@ test("Successful log out", async ({ page }) => {
 
   await page.waitForURL("/")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("欢迎回来，很高兴再次见到你。")).toBeVisible()
 
   await page.getByTestId("user-menu").click()
-  await page.getByRole("menuitem", { name: "Log out" }).click()
+  await page.getByRole("menuitem", { name: "退出登录" }).click()
   await page.waitForURL("/login")
 })
 
@@ -147,12 +166,10 @@ test("Logged-out user cannot access protected routes", async ({ page }) => {
 
   await page.waitForURL("/")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("欢迎回来，很高兴再次见到你。")).toBeVisible()
 
   await page.getByTestId("user-menu").click()
-  await page.getByRole("menuitem", { name: "Log out" }).click()
+  await page.getByRole("menuitem", { name: "退出登录" }).click()
   await page.waitForURL("/login")
 
   await page.goto("/settings")
