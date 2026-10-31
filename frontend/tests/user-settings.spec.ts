@@ -8,6 +8,7 @@ const tabs = ["个人信息", "密码", "危险操作"]
 
 test("My profile tab is active by default", async ({ page }) => {
   await page.goto("/settings")
+  await expect(page).toHaveTitle("设置 - AnySys")
   await expect(page.getByRole("tab", { name: "个人信息" })).toHaveAttribute(
     "aria-selected",
     "true",

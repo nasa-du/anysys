@@ -27,3 +27,10 @@
 - 契约未变：API 继续返回 ISO 8601（UTC `Z`），数据库继续存 UTC，未做时区迁移。
 - 测试：items/admin spec 改用中文选择器；新增创建时间断言，在浏览器时区为 `America/New_York` 的情况下验证单元格等于 API `created_at` 经 UTC+8 换算后的 `YYYY-MM-DD HH:mm`，并匹配 `^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$`；login spec 新增应用外壳中文文案与 FastAPI 零残留断言。
 - 验证：`bunx tsc -p tsconfig.json --noEmit`、`bun run build`、Biome 通过；Playwright 全量 72 passed。
+
+2026-10-31：代码审查跟进。
+
+- 补齐仪表盘、条目、设置、管理后台的页面标题 Playwright 断言（`页面名 - AnySys`），覆盖 spec 的“页面标题”验证项。
+- `EditUser` 复用 `lib/validation.ts` 的 `passwordSchema`，与 `AddUser`/`ChangePassword` 保持一致。
+- 审查提出的 DataTable 分页、ID 复制列与未使用的 `ui/pagination.tsx` 均为上游模板既有代码；本 ticket 只做了文案中文化，未改变其行为，按 spec 的“无关既有缺陷”范围不在此轮处理。
+- 复查：`bunx tsc -p tsconfig.json --noEmit`、Biome、`bun run build` 通过；Playwright 全量 72 passed。

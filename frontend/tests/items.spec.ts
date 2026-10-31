@@ -11,6 +11,7 @@ import { logInUser } from "./utils/user"
 
 test("Items page is accessible and shows correct title", async ({ page }) => {
   await page.goto("/items")
+  await expect(page).toHaveTitle("条目 - AnySys")
   await expect(page.getByRole("heading", { name: "条目" })).toBeVisible()
   await expect(page.getByText("创建和管理你的条目")).toBeVisible()
 })
