@@ -7,7 +7,7 @@ import AddUser from "@/components/Admin/AddUser"
 import { columns, type UserTableData } from "@/components/Admin/columns"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingUsers from "@/components/Pending/PendingUsers"
-import useAuth from "@/hooks/useAuth"
+import useAuth, { isAuthError } from "@/hooks/useAuth"
 
 function getUsersQueryOptions() {
   return {
@@ -20,7 +20,19 @@ function getUsersQueryOptions() {
 export const Route = createFileRoute("/_layout/admin")({
   component: Admin,
   beforeLoad: async () => {
-    const { data: user } = await UsersService.readUserMe()
+    let user: UserPublic
+    try {
+      const response = await UsersService.readUserMe()
+      user = response.data
+    } catch (error) {
+      if (isAuthError(error)) {
+        localStorage.removeItem("access_token")
+        throw redirect({
+          to: "/login",
+        })
+      }
+      throw error
+    }
     if (!user.is_superuser) {
       throw redirect({
         to: "/",
