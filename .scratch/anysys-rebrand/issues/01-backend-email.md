@@ -27,3 +27,10 @@
 - 邮件：三份 React Email 源文件改为简体中文并重新导出；主题为 `AnySys - 重置密码`、`AnySys - 新账号`、`AnySys - 测试邮件`；HTML `lang="zh-CN"`。重置密码邮件通过现有 superuser HTML 接口做 HTTP 级断言；其余两封以导出产物与源码检查确认。
 - 偏差说明：`password-recovery-html-content` 的响应头名 `"subject:"` 含非法字符，中文主题会触发 HTTP 客户端头校验失败；该头是非标准调试字段且无消费者，已从响应中移除，端点保持仅返回 HTML。已在 spec 中记录。
 - 验证：`uv run pytest` 全绿；`mypy app`、`ty check app`、`ruff check/format` 全部通过；production 文档开关以 `FASTAPI_ENV=production` 手动验证。
+
+2026-10-31：代码审查跟进修复。
+
+- `/docs` 与 `/redoc` 在 production 下此前会被前端 SPA fallback 接住：浏览器 `Accept: text/html` 得到 200 + index.html，并非 404。现在 production 下显式注册两个 404 路由（`include_in_schema=False`），两种 Accept 均实测 404；development 仍为 200。
+- 子类 `ChineseOAuth2PasswordBearer` 默认会把 OpenAPI 安全方案名改为 `ChineseOAuth2PasswordBearer`；已传入 `scheme_name="OAuth2PasswordBearer"` 恢复原契约，并新增 openapi.json 断言。
+- `test_create_item` 的 `owner_id` UUID v7 断言此前依赖超级管理员 id，遇到历史 v4 超级管理员会失败；改为先通过 `/users/signup` 创建用户并登录，再用该用户创建条目。
+- 移除 `recover_password_html_content` 冗余的 `HTMLResponse` 包装（路由已声明 `response_class=HTMLResponse`）；`main.py` 复用同一个 `is_development` 判断。

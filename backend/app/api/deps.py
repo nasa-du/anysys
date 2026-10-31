@@ -26,7 +26,8 @@ class ChineseOAuth2PasswordBearer(OAuth2PasswordBearer):
 
 
 reusable_oauth2 = ChineseOAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/login/access-token"
+    tokenUrl=f"{settings.API_V1_STR}/login/access-token",
+    scheme_name="OAuth2PasswordBearer",
 )
 
 

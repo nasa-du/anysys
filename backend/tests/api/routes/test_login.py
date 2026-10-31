@@ -13,6 +13,13 @@ from tests.utils.user import user_authentication_headers
 from tests.utils.utils import random_email, random_lower_string
 
 
+def test_openapi_security_scheme_name(client: TestClient) -> None:
+    response = client.get(f"{settings.API_V1_STR}/openapi.json")
+    assert response.status_code == 200
+    schemes = response.json()["components"]["securitySchemes"]
+    assert "OAuth2PasswordBearer" in schemes
+
+
 def test_get_access_token(client: TestClient) -> None:
     login_data = {
         "username": settings.FIRST_SUPERUSER,
